@@ -1,0 +1,10 @@
+{
+    "defaultGenesisHash": "000000000000000000000000",
+    "jwtSecretKey": "",
+    "mongodbConnectionString": "mongodb://0.0.0.0:27017/bclogs",
+    "sslKeyFile": "",
+    "sslCertFile": "",
+    "tcpPort": 1010,
+    "httpPort": 8080,
+    "httpsPort": 1919
+}
