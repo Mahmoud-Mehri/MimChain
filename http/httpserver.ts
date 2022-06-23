@@ -10,8 +10,8 @@ import { Transaction } from '../model/transaction';
 import { Logger } from '../controller/logger';
 import config from '../config.json';
 
-import * as generalMiddle from '../middleware/general';
-import * as nodeMiddle from '../middleware/nodes';
+import * as generalMiddle from './middleware/general';
+import * as nodeMiddle from './middleware/nodes';
 import { NodeInfo } from '../model/nodeinfo';
 
 config.httpPort = Number.parseInt(process.argv[2]) || config.httpPort;
