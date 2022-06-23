@@ -1,36 +1,38 @@
-import { Node } from './node'
 import { Transaction } from '../model/transaction';
 import { HashGenerator } from '../utils/hashgenerator';
 import * as types from '../utils/types';
 import { NodeInfo } from '../model/nodeinfo';
+import { BlockChain } from './blockchain';
+import { Block } from '../model/block';
 
 export class Network {
-    nodes: Map<string, NodeInfo>;
+    networkTime: number; // The Time it takes to make a new Block, in Miliseconds
     difficulty: number;
     baseGemFee: number;
     transactionPool: Array<Transaction>; // Pending Transactions
     transactions: Array<Transaction>; // Transactions which are confirmed and added to the Blockchain
+    blockChain: BlockChain;
     hashGenerator: HashGenerator;
 
     constructor() {
-        this.nodes = new Map([]);
+        this.networkTime = 1000; // 1 second
         this.difficulty = 1;
         this.baseGemFee = 0.001;
         this.transactionPool = [];
         this.transactions = [];
+        const genBlock = new Block(null);
+        this.blockChain = new BlockChain(genBlock);
         this.hashGenerator = HashGenerator.getInstance();
         this.hashGenerator.setDifficulty(this.difficulty);
     }
 
-    registerNode(node: NodeInfo) {
-        const nodeHash = this.hashGenerator.newSha256(node.host + node.port);
-        if (this.nodes.has(nodeHash)) {
-            return false;
-        } else {
-            node.hash = nodeHash;
-            this.nodes.set(nodeHash, node);
-            return true;
-        }
+    clone(network: Network) {
+        this.networkTime = network.networkTime;
+        this.difficulty = network.difficulty;
+        this.baseGemFee = network.baseGemFee;
+        this.transactionPool = Array.from(network.transactionPool);
+        this.transactions = Array.from(network.transactionPool);
+        this.blockChain.clone(network.blockChain);
     }
 
     setNetworkDifficulty(diff: number) {
@@ -42,47 +44,6 @@ export class Network {
     calculateGemFeePerTransaction() {
         const fee = (this.difficulty * 0.001);
         return this.baseGemFee + fee;
-    }
-
-    transferValue(from: string, to: string, value: number) {
-        const trans = new Transaction(from, to, value, this.calculateGemFeePerTransaction());
-
-    }
-
-    async checkTransactionStatus(hash: string) {
-        this.nodes.forEach((node, index, array) => {
-
-        })
-    }
-
-    getTransactionStatus(transHash: string) {
-        const tranStatus = types.TransactionStatus.tsConfirmed;
-        return tranStatus;
-    }
-
-    getTransactionList(dateFrom: Date | null, status: types.TransactionStatus | null) {
-        if (!dateFrom || !status) {
-            return this.transactions.filter((trans: Transaction) => {
-                let accept;
-                if (!dateFrom) {
-                    accept = (trans.timestamp >= dateFrom!);
-                }
-                if (!status) {
-                    accept = (trans.status == status!);
-                }
-
-                return accept;
-            })
-        }
-        return this.transactions;
-    }
-
-    broadcastNewTransaction() {
-
-    }
-
-    checkTransactionConfirmation() {
-
     }
 
 }
