@@ -1,17 +1,6 @@
 import * as types from '../utils/types';
 import { HashGenerator } from '../utils/hashgenerator';
-
-class Account {
-    number: string;
-    balance: number;
-    nonce: number;
-
-    constructor(number: string) {
-        this.number = number;
-        this.balance = 0;
-        this.nonce = 0;
-    }
-}
+import { Account } from './account';
 
 export class Wallet {
     hashGenerator: HashGenerator;
@@ -22,8 +11,8 @@ export class Wallet {
         this.privateKey = privateKey;
         this.hashGenerator = HashGenerator.getInstance();
 
-        const firstAccountNumber = this.hashGenerator.newAccountNumber(privateKey);
-        const firstAccount = new Account(firstAccountNumber);
+        const firstAccountAddress = this.hashGenerator.newAccountAddress(privateKey);
+        const firstAccount = new Account(firstAccountAddress);
         this.accounts = [firstAccount];
     }
 
@@ -35,6 +24,6 @@ export class Wallet {
     }
 
     newAccount() {
-        return new Account(this.hashGenerator.newAccountNumber(this.privateKey));
+        return new Account(this.hashGenerator.newAccountAddress(this.privateKey, this.accounts.length));
     }
 }

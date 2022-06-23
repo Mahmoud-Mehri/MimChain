@@ -1,29 +1,44 @@
 import { Transaction } from "./transaction";
 import config from "../config.json";
 
-export class Block {
-    index: number;
-    previousHash: string;
-    transactions: Array<Transaction>;
+class BlockHeader {
+    number: number;
+    previousBlockHash: string;
     nonce: number;
     hash: string;
 
-    constructor(prevBlock: Block | null) {
-        if (prevBlock) {
-            this.index = prevBlock.index + 1;
-            this.previousHash = prevBlock.hash;
+    constructor(header: BlockHeader | null) {
+        if (header) {
+            this.number = header.number + 1;
+            this.previousBlockHash = header.hash;
         } else {
-            this.index = 0;
-            this.previousHash = config.defaultGenesisHash;
+            this.number = 0;
+            this.previousBlockHash = config.defaultGenesisHash;
         }
 
         this.nonce = 0;
         this.hash = "";
+    }
+}
+
+export class Block {
+    header: BlockHeader;
+    transactions: Array<Transaction>;
+
+    constructor(prevBlock: Block | null, blockNumber = 1) {
+        if (prevBlock) {
+            this.header = new BlockHeader(prevBlock.header);
+        } else {
+            this.header = new BlockHeader(null);
+            this.header.number = blockNumber;
+            this.header.previousBlockHash = config.defaultGenesisHash;
+        }
+
         this.transactions = [];
     }
 
     get key() {
-        return JSON.stringify(this.transactions) + this.index + this.previousHash + this.nonce;
+        return JSON.stringify(this.transactions) + this.header.number + this.header.previousBlockHash + this.header.nonce;
     }
 
     addTransaction(transaction: Transaction) {

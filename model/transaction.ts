@@ -8,9 +8,7 @@ export class Transaction {
     gemFee: number;
     nonce: number;
     hash: string;
-    status: types.TransactionStatus;
     timestamp: Date;
-    lastUpdate: Date;
 
     constructor(from: string, to: string, value: number, gasFee: number) {
         this.from = from;
@@ -19,9 +17,7 @@ export class Transaction {
         this.gemFee = gasFee;
         this.nonce = 0;
         this.hash = "";
-        this.status = types.TransactionStatus.tsPending;
         this.timestamp = new Date();
-        this.lastUpdate = new Date();
         this.blockNumber = -1;
     }
 
@@ -34,13 +30,4 @@ export class Transaction {
         return true;
     }
 
-    seStatus(newStatus: types.TransactionStatus) {
-        if (this.status == types.TransactionStatus.tsPending) {
-            this.status = newStatus;
-            this.lastUpdate = new Date();
-
-            return true;
-        }
-        return false;
-    }
 }
