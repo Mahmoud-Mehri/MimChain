@@ -1,6 +1,10 @@
+import * as types from '../utils/types';
 import { Network } from './network';
 import { Block } from "../model/block";
 import { NodeInfo } from '../model/nodeinfo';
+import { HashGenerator } from '../utils/hashgenerator';
+import { TransactionInfo } from '../model/transactioninfo';
+import { Transaction } from '../model/transaction';
 
 export class Node {
 
@@ -29,12 +33,47 @@ export class Node {
 
     }
 
+    async createTransaction(transInfo: TransactionInfo) {
+        return new Promise((resolve, reject) => {
+            const accountFrom = this.network.getAccount(transInfo.privateKey, transInfo.from);
+            if (!accountFrom)
+                reject(types.ResultObject(false, "Sender account address is not valid"));
+
+            const gemFee = this.network.gemFeePerTransaction;
+            if (transInfo.gemLimit < gemFee)
+                reject(types.ResultObject(false, "Gem Limit amount is less than required Gem Fee"));
+
+            if (accountFrom.balance < (transInfo.value + gemFee))
+                reject(types.ResultObject(false, "Sender account has not enough balance"));
+
+            // const accountTo = this.network.getAccount('', transInfo.to);
+            // if (!accountTo)
+            //     reject(types.ResultObject(false, "Recipient account is not valid"));
+
+            const sign = this.signTransaction();
+            this.network.addNewTransaction(transInfo, sign);
+        })
+    }
+
+    signTransaction() {
+        return "";
+    }
+
+    async confirmBlock(block: Block, blockHash: string) {
+        this.network.hashGenerator.newBlockHash(block)
+            .then(hash => {
+                if (hash == blockHash) {
+
+                }
+            })
+    }
+
     async mineBlock() {
         // const block = new Block(this.network.blockchain.blocks[this.network.blockchain.blocks.size - 1]);
 
     }
 
-    transferValue(from: string, to: string, value: number) {
+    async transferValue(from: string, to: string, value: number) {
         // const trans = new Transaction(from, to, value, this.calculateGemFeePerTransaction());
 
     }

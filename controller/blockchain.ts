@@ -1,7 +1,6 @@
 import { Block } from '../model/block';
 import { Transaction } from '../model/transaction';
 import { HashGenerator } from '../utils/hashgenerator';
-import { ReverseLinkedList } from '../utils/linked-block-list';
 
 export class BlockChain {
 
@@ -19,6 +18,13 @@ export class BlockChain {
         this._genesisBlockHash = genesisBlock.header.hash;
         this.blocks[this._genesisBlockHash] = genesisBlock;
         this._currentBlockHash = this._genesisBlockHash;
+    }
+
+    clone(blockChain: BlockChain) {
+        this._genesisBlockHash = blockChain.genesisBlock.header.hash;
+        this._currentBlockHash = blockChain.currentBlock.header.hash;
+
+
     }
 
     get genesisBlock() {
