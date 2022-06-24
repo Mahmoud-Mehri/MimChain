@@ -1,6 +1,7 @@
 import * as sha from 'js-sha256';
-import { Transaction } from '../model/transaction';
+import { TransactionInfo } from '../model/transactioninfo';
 import { Block } from '../model/block';
+import { Account } from '../model/account';
 
 export class HashGenerator {
     private static instance: HashGenerator;
@@ -32,21 +33,21 @@ export class HashGenerator {
         return hash;
     }
 
-    newAccountNumber(privateKey: string, nonce: number = 1) {
+    newAccountAddress(privateKey: string, nonce: number = 1) {
         return sha.sha224(privateKey + nonce);
     }
 
-    newTransactionHash(trans: Transaction, privateKey: string) {
-        const hash = sha.sha256(trans.key + privateKey);
+    newTransactionHash(accountInfo: Account) {
+        const hash = sha.sha256(accountInfo.address + accountInfo.nonce);
         return hash;
     }
 
     newBlockHash(block: Block) {
         return new Promise<string>((resolve, reject) => {
-            const sign = '0'.repeat(this.difficulty);
+            const sign = '0'.repeat(block.header.difficulty);
             let hash = sha.sha256(block.key);
             while (!hash.startsWith(sign)) {
-                block.nonce++;
+                block.header.nonce++;
                 hash = sha.sha256(block.key);
             }
             resolve(hash);
