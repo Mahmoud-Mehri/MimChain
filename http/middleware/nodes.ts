@@ -1,6 +1,6 @@
 import * as jwt from 'jsonwebtoken';
 import { NextFunction, Request, Response } from "express";
-import config from '../config.json';
+import config from '../../config.json';
 
 const signNode = function (req: Request, res: Response, next: NextFunction) {
     next();
