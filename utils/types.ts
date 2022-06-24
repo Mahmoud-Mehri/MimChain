@@ -15,4 +15,18 @@ export enum LogType {
     ltInfo = "INFO"
 }
 
+export function ResultObject(_success: boolean, _data: any) {
+    if (_success) {
+        return {
+            success: _success,
+            data: _data
+        }
+    } else {
+        return {
+            success: _success,
+            error: _data
+        }
+    }
+}
+
 
