@@ -1,8 +1,8 @@
 import * as Net from 'net';
-import * as config from './config.json';
-import { NodeInfo } from './model/nodeinfo';
+import * as config from '../config.json';
+import { NodeInfo } from '../model/nodeinfo';
 
-import { Network } from './controller/network';
+import { Network } from '../controller/network';
 
 
 const newNode = async (nodeInfo: NodeInfo) => {
