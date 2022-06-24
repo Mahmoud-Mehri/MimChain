@@ -6,7 +6,7 @@ import * as Https from 'https';
 import * as fs from 'fs';
 
 import { Node } from '../controller/node';
-import { Transaction } from '../model/transaction';
+import { TransactionInfo } from '../model/transactioninfo';
 import { Logger } from '../controller/logger';
 import config from '../config.json';
 
@@ -25,12 +25,12 @@ app.use(express.json({ limit: '1mb' }));
 app.use(generalMiddle.jsonHeaderForResponses);
 app.use('/nodes', nodeMiddle.signNode);
 
-app.post('/nodes/register', (req, res) => { // Register new Node and broadcast network
+app.post('/nodes/new', (req, res) => { // Register new Node and broadcast network
     const nodeInfo = new NodeInfo(req.body.host, req.body.port);
     if (node.registerNode(nodeInfo)) {
         res.send({
             nodes: [...node.nodes.values()],
-            transactions: node.transactions,
+            transactions: Array.from(node.transactions),
             difficulty: node.difficulty,
             baseGemFee: node.baseGemFee
         });
@@ -51,7 +51,8 @@ app.post('/nodes/register', (req, res) => { // Register new Node and broadcast n
     }
 });
 
-app.post('/nodes', (req, res) => {  // adding new Node to the Node List
+// adding new Node to the Node List - When broadcasting new Node Registration
+app.post('/nodes', (req, res) => {
     const nodeInfo = req.body;
     console.log(nodeInfo);
     if (node.registerNode(nodeInfo)) {
@@ -59,6 +60,28 @@ app.post('/nodes', (req, res) => {  // adding new Node to the Node List
     }
 });
 
+// Creating new Transaction and Adding it to the Transaction Pool
+app.post('/transactions/new', (req, res) => {
+    const transInfo = new TransactionInfo(req.body);
+    const newTrans = node.network.createTransaction(transInfo);
+    if (newTrans) {
+        // Broadcasting new node registration to the network
+        for (var [hash, node] of node.nodes) {
+            axios.post(`http://${node.host}:${node.port}/transactions`, transInfo)
+                .then((response) => {
+                    logger.addInfoLog(`New Transaction added to the Transaction Pool: ${node.key}`);
+
+                })
+                .catch((err) => {
+                    logger.addErrorLog(`Adding new Transaction: ${node.key} \
+                    failed with message: ${err.message}`);
+                })
+        }
+    }
+})
+
+// adding new Transaction to the Transaction Pool
+// When broadcasting new Transaction Creation
 app.post('/transactions', (req, res) => {
 
 })
