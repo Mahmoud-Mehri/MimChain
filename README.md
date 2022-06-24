@@ -1,2 +1,2 @@
 # MimChain
-A simple implementation of a Blockchain network
+A simple implementation of a custom Blockchain network
